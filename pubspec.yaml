@@ -1,12 +1,13 @@
 name: escposprinter
 description: A new flutter plugin project.
-version: 0.0.1
-author: Marcus Felix <marcus@samhaus.com>
+version: 0.0.2
 homepage: https://samhaus.com
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
 
 # For information on the generic Dart part of this file, see the
@@ -21,6 +22,9 @@ flutter:
         pluginClass: EscposprinterPlugin
       macos:
         pluginClass: EscposprinterPlugin
+      web:
+        pluginClass: EscposprinterWeb
+        fileName: escposprinter_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
