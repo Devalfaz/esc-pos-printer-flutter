@@ -462,9 +462,25 @@ class EscposprinterWeb {
   PlatformException _platformException(Object error, String fallbackMessage) {
     final name = _safeJsProperty(error, 'name')?.toString();
     final message = _safeJsProperty(error, 'message')?.toString();
+    final resolvedMessage =
+        message == null ? fallbackMessage : '$fallbackMessage: $message';
+
+    if (name == 'SecurityError' &&
+        message != null &&
+        message.contains("'open'") &&
+        message.toLowerCase().contains('access denied')) {
+      return PlatformException(
+        code: 'webusb_access_denied',
+        message: '$resolvedMessage. On Windows, WebUSB requires the printer '
+            'interface to use a WinUSB-compatible driver and it cannot be in '
+            'use by the Windows printer spooler, vendor driver, or another app.',
+        details: error.toString(),
+      );
+    }
+
     return PlatformException(
       code: name ?? 'webusb_error',
-      message: message == null ? fallbackMessage : '$fallbackMessage: $message',
+      message: resolvedMessage,
       details: error.toString(),
     );
   }

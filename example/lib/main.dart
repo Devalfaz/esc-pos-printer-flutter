@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,11 +42,12 @@ class _HomeState extends State<Home> {
     try {
       returned = await Escposprinter.getUSBDeviceList;
     } on PlatformException catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to get USB device list. PlatformException: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('Failed to get USB device list. PlatformException: $e')));
     } on Exception catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to get USB device list. Exception: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to get USB device list. Exception: $e')));
     }
 
     setState(() {
@@ -56,29 +56,34 @@ class _HomeState extends State<Home> {
   }
 
   _connect(int vendor, int product) async {
-    print('🔌 Flutter: Attempting to connect to printer - VendorID: $vendor, ProductID: $product');
+    print(
+        '🔌 Flutter: Attempting to connect to printer - VendorID: $vendor, ProductID: $product');
     bool returned = false;
     try {
       returned = await Escposprinter.connectPrinter(vendor, product);
       print('🔌 Flutter: Connection result: $returned');
     } on PlatformException catch (e) {
       print('❌ Flutter: PlatformException during connection: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to connect. PlatformException: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to connect. PlatformException: $e')));
     } on Exception catch (e) {
       print('❌ Flutter: Exception during connection: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to connect. Exception: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to connect. Exception: $e')));
     }
     if (returned) {
       print('✅ Flutter: Connection successful, updating UI state');
       setState(() {
         connected = true;
       });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('✅ Connected to printer!'), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('✅ Connected to printer!'),
+          backgroundColor: Colors.green));
     } else {
       print('❌ Flutter: Connection failed');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('❌ Failed to connect to printer'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('❌ Failed to connect to printer'),
+          backgroundColor: Colors.red));
     }
   }
 
@@ -94,21 +99,25 @@ class _HomeState extends State<Home> {
       print('🖨️ Flutter: Print result: $result');
 
       if (result) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('✅ Print command sent successfully!'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('✅ Print command sent successfully!'),
+            backgroundColor: Colors.green));
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('❌ Print command failed'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('❌ Print command failed'),
+            backgroundColor: Colors.red));
       }
 
       // await Escposprinter.printRawData("text");
       // await Escposprinter.printText("Testing ESC POS printer...");
     } on PlatformException catch (e) {
       print('❌ Flutter: PlatformException during print: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to print. PlatformException: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to print. PlatformException: $e')));
     } on Exception catch (e) {
       print('❌ Flutter: Exception during print: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to print. Exception: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to print. Exception: $e')));
     }
   }
 
@@ -145,11 +154,16 @@ class _HomeState extends State<Home> {
     return devices
         .map((device) => new ListTile(
               onTap: () {
-                _connect(int.parse(device['vendorid']), int.parse(device['productid']));
+                _connect(int.parse(device['vendorid']),
+                    int.parse(device['productid']));
               },
               leading: new Icon(Icons.usb),
-              title: new Text(device['manufacturer'].toString() + " " + device['product'].toString()),
-              subtitle: new Text(device['vendorid'].toString() + " " + device['productid'].toString()),
+              title: new Text(device['manufacturer'].toString() +
+                  " " +
+                  device['product'].toString()),
+              subtitle: new Text(device['vendorid'].toString() +
+                  " " +
+                  device['productid'].toString()),
             ))
         .toList();
   }

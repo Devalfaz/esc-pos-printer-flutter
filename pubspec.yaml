@@ -1,6 +1,6 @@
 name: escposprinter
 description: A new flutter plugin project.
-version: 0.0.2
+version: 0.0.3
 homepage: https://samhaus.com
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -22,6 +22,8 @@ flutter:
         pluginClass: EscposprinterPlugin
       macos:
         pluginClass: EscposprinterPlugin
+      windows:
+        pluginClass: EscposprinterPluginCApi
       web:
         pluginClass: EscposprinterWeb
         fileName: escposprinter_web.dart
