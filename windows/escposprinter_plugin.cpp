@@ -185,23 +185,42 @@ std::vector<PrinterDevice> EnumeratePrinters() {
   return printers;
 }
 
-int SyntheticProductId(const PrinterDevice& device) {
+uint32_t StablePrinterHash(const PrinterDevice& device,
+                           const std::wstring& salt) {
   uint32_t hash = 2166136261u;
-  const std::wstring source = device.name + L"|" + device.port_name;
+  const std::wstring source =
+      salt + L"|" + device.name + L"|" + device.port_name;
   for (const wchar_t character : source) {
     hash ^= static_cast<uint32_t>(character);
     hash *= 16777619u;
   }
+  return hash;
+}
+
+int SyntheticVendorId(const PrinterDevice& device) {
+  return static_cast<int>(
+      65536u + (StablePrinterHash(device, L"vendor") % 2147418111u));
+}
+
+int SyntheticProductId(const PrinterDevice& device) {
+  const uint32_t hash = StablePrinterHash(device, L"product");
   return static_cast<int>((hash % 65534u) + 1u);
+}
+
+int EffectiveVendorId(const PrinterDevice& device) {
+  return device.vendor_id.value_or(SyntheticVendorId(device));
+}
+
+int EffectiveProductId(const PrinterDevice& device) {
+  return device.product_id.value_or(SyntheticProductId(device));
 }
 
 flutter::EncodableMap DeviceToMap(const PrinterDevice& device) {
   const std::string name = WideToUtf8(device.name);
   const std::string driver_name = WideToUtf8(device.driver_name);
   const std::string port_name = WideToUtf8(device.port_name);
-  const int effective_vendor_id = device.vendor_id.value_or(65535);
-  const int effective_product_id =
-      device.product_id.value_or(SyntheticProductId(device));
+  const int effective_vendor_id = EffectiveVendorId(device);
+  const int effective_product_id = EffectiveProductId(device);
   const bool synthetic_id = !device.vendor_id || !device.product_id;
 
   return flutter::EncodableMap{
@@ -224,18 +243,8 @@ flutter::EncodableMap DeviceToMap(const PrinterDevice& device) {
 bool MatchesPrinterIds(const PrinterDevice& printer,
                        int vendor_id,
                        int product_id) {
-  if (printer.vendor_id.has_value() && printer.product_id.has_value() &&
-      printer.vendor_id == vendor_id && printer.product_id == product_id) {
-    return true;
-  }
-
-  if (vendor_id != 65535) {
-    return false;
-  }
-
-  const int synthetic_product_id = SyntheticProductId(printer);
-  return (!printer.vendor_id || !printer.product_id) &&
-         product_id == synthetic_product_id;
+  return vendor_id == EffectiveVendorId(printer) &&
+         product_id == EffectiveProductId(printer);
 }
 
 std::optional<std::wstring> FindPrinterNameByUsbIds(int vendor_id,

@@ -173,9 +173,10 @@ Windows desktop builds use the native Windows print spooler instead of WebUSB.
 The plugin enumerates installed printer queues, uses VID/PID information when
 Windows exposes it, selects the matching queue in `connectPrinter`, and sends
 `printText`, `printRawData`, and `write` bytes as a RAW print job.
-If Windows does not expose VID/PID for a printer queue, the plugin returns a
-stable Windows-only synthetic ID so the existing `connectPrinter(vendor,
-product)` flow can still select it from `getUSBDeviceList`.
+If Windows does not expose VID/PID for a printer queue, the plugin returns
+stable Windows-only synthetic IDs for the missing values so the existing
+`connectPrinter(vendor, product)` flow can still select it from
+`getUSBDeviceList`.
 
 For Windows desktop clients:
 
